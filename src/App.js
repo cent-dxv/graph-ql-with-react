@@ -36,7 +36,12 @@ const authLink = new ApolloLink((operation, forward) => {
 
 
 const client = new ApolloClient({
- link: authLink.concat(httpLink),
+ link:ApolloLink.split( 
+  operation => operation.getContext().clientName === 'httpLink', 
+  authLink.concat(httpLink),
+  pokeapi,
+  
+  ),
  cache: new InMemoryCache()
 });
 
@@ -93,6 +98,7 @@ function Query() {
 variables : { "login": "The-Road-to-learn-React",
 "repositoryName2": "the-road-to-learn-react-chinese",
 "withFork": true,}
+,context : {clientName : "httpLink"}
   });
 
   console.log(loading);
@@ -120,9 +126,9 @@ variables : { "login": "The-Road-to-learn-React",
 }
 
 function Another_query() {
-  // const { loading, error, data } = useQuery(GET_org);
+  const { loading, error, data } = useQuery(GET_GEN_3);
 
-  // console.log(loading);
-  // console.log(error);
-  // data && console.log(data);
+  console.log(loading);
+  console.log(error);
+  data && console.log(data);
 }
