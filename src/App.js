@@ -5,46 +5,41 @@ import {
   InMemoryCache,
   ApolloProvider,
   useQuery,
-
   ApolloLink,
-
   createHttpLink,
-
 } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { GET_org, GET_GEN_3 } from "./gql/query";
+import { GET_org, GET_GEN_3, GET_SpaceX } from "./gql/query";
 
-
-const httpLink = new createHttpLink({uri :'https://api.github.com/graphql'})
-const pokeapi = new createHttpLink({uri :'https://beta.pokeapi.co/graphql/v1beta'})
-
+const httpLink = new createHttpLink({ uri: "https://api.github.com/graphql" });
+const pokeapi = new createHttpLink({
+  uri: "https://beta.pokeapi.co/graphql/v1beta",
+});
+const spaceX = new createHttpLink({ uri: "https://api.spacex.land/graphql" });
 
 const authLink = new ApolloLink((operation, forward) => {
-  
-  const token = "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"
+  const token = "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";
 
   // Use the setContext method to set the HTTP headers.
   operation.setContext({
     headers: {
-      authorization: token ? `Bearer ${token}` : ''
-    }
+      authorization: token ? `Bearer ${token}` : "",
+    },
   });
 
   // Call the next link in the middleware chain.
   return forward(operation);
 });
 
-
 const client = new ApolloClient({
- link:ApolloLink.split( 
-  operation => operation.getContext().clientName === 'httpLink', 
-  authLink.concat(httpLink),
-  pokeapi,
-  
+  link: ApolloLink.split(
+    (operation) => operation.getContext().clientName === "httpLink",
+    authLink.concat(httpLink),
+    pokeapi,
+    spaceX,
   ),
- cache: new InMemoryCache()
+  cache: new InMemoryCache(),
 });
-
 
 // const client = new ApolloClient({
 //   // uri: "https://beta.pokeapi.co/graphql/v1beta",
@@ -59,7 +54,6 @@ const inline = () =>
     .query({
       // query: GET_org,
       query: GET_GEN_3,
-
     })
 
     .then((result) => console.log(result))
@@ -94,41 +88,64 @@ function App() {
 export default App;
 
 function Query() {
-  const { loading, error, data } = useQuery(GET_org,{
-variables : { "login": "The-Road-to-learn-React",
-"repositoryName2": "the-road-to-learn-react-chinese",
-"withFork": true,}
-,context : {clientName : "httpLink"}
+  const { loading, error, data } = useQuery(GET_org, {
+    variables: {
+      login: "The-Road-to-learn-React",
+      repositoryName2: "the-road-to-learn-react-chinese",
+      withFork: true,
+    },
+    context: { clientName: "httpLink" },
   });
 
-  console.log(loading);
-  console.log(error);
-  data && console.log(data.book.repositories.nodes);
+  // console.log(loading);
+  // console.log(error);
+  // data && console.log(data.book.repositories.nodes);
 
   return (
     <>
-    <h1> This graph ql data</h1>
-         <h1> {data && data.book.name}</h1>
-            <p> {data?.book.url}</p>
-            <p> and other left projects</p>
-            <ul>
-              {data?.book.repositories.nodes.map((repo) =>(
-                <>
-                  <li> <h5>{repo.name} </h5> </li>
-                </>
-              ))}
-            </ul>
-            <h1> {data?.company.name}</h1>
-            <p> {data?.company.url}</p> 
+      <h1> This graph ql data</h1>
+      <h1> {data && data.book.name}</h1>
+      <p> {data?.book.url}</p>
+      <p> and other left projects</p>
+      <ul>
+        {data?.book.repositories.nodes.map((repo ,index) => (
+          
+            <li key={index}>
+              {" "}
+              <h5>{repo.name} </h5>{" "}
+            </li>
+  
+        ))}
+      </ul>
+      <h1> {data?.company.name}</h1>
+      <p> {data?.company.url}</p>
       <Another_query />
     </>
   );
 }
 
 function Another_query() {
-  const { loading, error, data } = useQuery(GET_GEN_3);
+  const { loading, error, data } = useQuery(GET_GEN_3, {
+    variables: { limit: 3 },
+    context: { clientName: "pokeapi" },
+  });
 
   console.log(loading);
   console.log(error);
   data && console.log(data);
+  return (
+    <>
+      <h1> This pockman data</h1>
+      <h2> {data?.pokemon_v2_pokemonspecies?.__typename}</h2>
+      {data?.pokemon_v2_pokemonspecies.map((pock ,index) => (
+     
+          <h3 key ={index}> {pock.name}</h3>
+       
+      ))}
+
+ 
+    </>
+  );
 }
+
+
