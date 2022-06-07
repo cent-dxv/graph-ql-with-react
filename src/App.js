@@ -88,7 +88,7 @@ const gitfx = async () => {
   const response = await fetch("https://api.github.com/graphql", {
     method: "POST",
     headers: {
-      Authorization: "Bearer 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",
+      Authorization: `bearer ${process.env.REACT_APP_GIT_ACCESS_TOKEN }`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -106,6 +106,7 @@ function App() {
   useEffect(() => {
     // basic();
     // ax()
+    console.log(process.env.REACT_APP_GIT_ACCESS_TOKEN)
 
     async function callAsync() {
       var data = await gitfx();
