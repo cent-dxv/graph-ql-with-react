@@ -18,7 +18,7 @@ const pokeapi = new createHttpLink({
 const spaceX = new createHttpLink({ uri: "https://api.spacex.land/graphql" });
 
 const authLink = new ApolloLink((operation, forward) => {
-  const token = "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";
+  const token = `${process.env.REACT_APP_GIT_ACCESS_TOKEN}`;
 
   // Use the setContext method to set the HTTP headers.
   operation.setContext({
